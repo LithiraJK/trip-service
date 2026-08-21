@@ -1,0 +1,15 @@
+# =====================================================
+# trip-service — Local Bootstrap Configuration
+#
+# Minimal config to locate the config-server.
+# All other properties (MongoDB URI, Gemini key,
+# GCP bucket name, port, etc.) are loaded from:
+#   config-server → classpath:/configs/trip-service.yml
+# =====================================================
+
+spring:
+  application:
+    name: trip-service
+
+  config:
+    import: optional:configserver:http://localhost:8888
