@@ -27,7 +27,7 @@ import java.util.List;
  * All write operations require the gateway to have validated the user's JWT.
  */
 @RestController
-@RequestMapping("/api/v1/trip")
+@RequestMapping({"/api/v1/trip", "/trip", "/trips", "/api/trips"})
 public class TripController {
 
     private final TripService tripService;
@@ -48,7 +48,7 @@ public class TripController {
             @RequestHeader("X-User-Id") String userId) {
         TripResponse trip = tripService.generateTrip(request, userId);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success(201, "Trip generated successfully", trip));
+            .body(ApiResponse.success(201, "Trip generated successfully", trip));
     }
 
     // ── Public Browse ─────────────────────────────────────────────────────────
@@ -57,7 +57,7 @@ public class TripController {
      * GET /api/v1/trip/all?page=1&limit=4 — Public
      * Returns paginated list of all trips (newest first).
      */
-    @GetMapping("/all")
+    @GetMapping({"/all", ""})
     public ResponseEntity<ApiResponse<PagedResponse<TripResponse>>> getAllTrips(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "4") int limit) {

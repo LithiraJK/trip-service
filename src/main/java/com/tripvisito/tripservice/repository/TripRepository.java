@@ -53,7 +53,7 @@ public interface TripRepository extends MongoRepository<Trip, String> {
         "{ '$group': { '_id': { '$dateToString': { 'format': '%Y-%m-%d', 'date': '$createdAt' } }, 'count': { '$sum': 1 } } }",
         "{ '$sort': { '_id': 1 } }"
     })
-    List<org.bson.Document> findTripTrend(LocalDateTime since);
+    List<com.tripvisito.tripservice.dto.response.TripTrendResult> findTripTrend(LocalDateTime since);
 
     // ── Stats: Travel Style Breakdown ─────────────────────────────────────────
 
@@ -67,7 +67,7 @@ public interface TripRepository extends MongoRepository<Trip, String> {
         "{ '$project': { 'style': '$_id', 'count': 1, '_id': 0 } }",
         "{ '$sort': { 'count': -1 } }"
     })
-    List<org.bson.Document> findTripsByTravelStyle();
+    List<com.tripvisito.tripservice.dto.response.TravelStyleBreakdownResult> findTripsByTravelStyle();
 
     // ── Public Browse ─────────────────────────────────────────────────────────
 

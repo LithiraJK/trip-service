@@ -6,6 +6,8 @@ import com.tripvisito.tripservice.document.embedded.TripDetails;
 import com.tripvisito.tripservice.dto.request.GenerateTripRequest;
 import com.tripvisito.tripservice.dto.response.PagedResponse;
 import com.tripvisito.tripservice.dto.response.TripResponse;
+import com.tripvisito.tripservice.dto.response.TripTrendResult;
+import com.tripvisito.tripservice.dto.response.TravelStyleBreakdownResult;
 import com.tripvisito.tripservice.exception.TripNotFoundException;
 import com.tripvisito.tripservice.repository.TripRepository;
 import org.bson.Document;
@@ -253,16 +255,16 @@ public class TripService {
         // Daily trend for last 7 days
         List<Integer> trend = tripRepository.findTripTrend(sevenDaysAgo)
                 .stream()
-                .map(doc -> ((Number) doc.get("count")).intValue())
+                .map(item -> item.getCount() != null ? item.getCount() : 0)
                 .collect(Collectors.toList());
 
         // Travel style breakdown
         List<Map<String, Object>> travelStyleBreakdown = tripRepository.findTripsByTravelStyle()
                 .stream()
-                .map(doc -> {
+                .map(item -> {
                     Map<String, Object> entry = new HashMap<>();
-                    entry.put("style", doc.getString("style"));
-                    entry.put("count", ((Number) doc.get("count")).longValue());
+                    entry.put("style", item.getStyle());
+                    entry.put("count", item.getCount() != null ? item.getCount().longValue() : 0L);
                     return entry;
                 })
                 .collect(Collectors.toList());

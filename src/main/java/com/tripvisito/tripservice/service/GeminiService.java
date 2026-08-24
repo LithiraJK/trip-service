@@ -68,6 +68,10 @@ public class GeminiService {
      * @throws RuntimeException if the AI call or JSON parsing fails
      */
     public TripDetails generateTripDetails(GenerateTripRequest request) {
+        if (apiKey == null || apiKey.trim().isEmpty()) {
+            throw new IllegalArgumentException("Google Gemini API Key is missing. Please set the GEMINI_API_KEY in the root .env file and restart the services.");
+        }
+
         String prompt = buildPrompt(request);
 
         // ── Build Gemini request body ─────────────────────────────────────
@@ -84,15 +88,21 @@ public class GeminiService {
         // ── Build HTTP headers ────────────────────────────────────────────
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("x-goog-api-key", apiKey);
+        headers.set("x-goog-api-key", apiKey.trim());
 
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
+
+        // Append key to request URL as query param (official/standard method for Gemini API)
+        String requestUrl = apiUrl;
+        if (!requestUrl.contains("key=")) {
+            requestUrl = requestUrl + "?key=" + apiKey.trim();
+        }
 
         log.info("[GeminiService] Generating trip for: country={}, style={}, days={}",
                 request.getCountry(), request.getTravelStyle(), request.getNumberOfDays());
 
         try {
-            ResponseEntity<String> response = restTemplate.postForEntity(apiUrl, entity, String.class);
+            ResponseEntity<String> response = restTemplate.postForEntity(requestUrl, entity, String.class);
 
             if (response.getStatusCode() != HttpStatus.OK || response.getBody() == null) {
                 throw new RuntimeException("Gemini API returned status: " + response.getStatusCode());
