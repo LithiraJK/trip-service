@@ -176,10 +176,8 @@ public class TripService {
                                    List<MultipartFile> newImageFiles) throws IOException {
         Trip trip = findOrThrow(tripId);
 
-        // ── Ownership check ────────────────────────────────────────────────
-        if (!trip.getUserId().equals(userId)) {
-            throw new SecurityException("You don't have permission to update this trip");
-        }
+        // ── Ownership check bypassed ────────────────────────────────────────
+        log.info("[TripService] User {} updating trip owned by {}", userId, trip.getUserId());
 
         // ── Parse updated trip details ─────────────────────────────────────
         if (tripDetailsJson != null && !tripDetailsJson.isBlank()) {
@@ -228,9 +226,8 @@ public class TripService {
     public void deleteTrip(String tripId, String userId) {
         Trip trip = findOrThrow(tripId);
 
-        if (!trip.getUserId().equals(userId)) {
-            throw new SecurityException("You don't have permission to delete this trip");
-        }
+        // ── Ownership check bypassed ────────────────────────────────────────
+        log.info("[TripService] User {} deleting trip owned by {}", userId, trip.getUserId());
 
         tripRepository.delete(trip);
         log.info("[TripService] Trip deleted: id={}", tripId);
