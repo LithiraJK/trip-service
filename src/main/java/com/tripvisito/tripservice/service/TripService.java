@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tripvisito.tripservice.document.Trip;
 import com.tripvisito.tripservice.document.embedded.TripDetails;
 import com.tripvisito.tripservice.dto.request.GenerateTripRequest;
+import com.tripvisito.tripservice.dto.request.TripRequest;
 import com.tripvisito.tripservice.dto.response.PagedResponse;
 import com.tripvisito.tripservice.dto.response.TripResponse;
 import com.tripvisito.tripservice.dto.response.TripTrendResult;
@@ -291,6 +292,32 @@ public class TripService {
     }
 
     // ── Helper ────────────────────────────────────────────────────────────────
+
+    public TripResponse createTrip(TripRequest request, String userId) {
+        Trip trip = Trip.builder()
+                .tripDetails(request.getTripDetails())
+                .imageUrls(request.getImageUrls() != null ? request.getImageUrls() : new ArrayList<>())
+                .paymentLink("")
+                .userId(userId)
+                .createdAt(LocalDateTime.now())
+                .build();
+        Trip saved = tripRepository.save(trip);
+        log.info("[TripService] Direct Trip created: id={}", saved.getId());
+        return TripResponse.from(saved);
+    }
+
+    public TripResponse updateTripDirect(String tripId, TripRequest request, String userId) {
+        Trip trip = findOrThrow(tripId);
+        if (request.getTripDetails() != null) {
+            trip.setTripDetails(request.getTripDetails());
+        }
+        if (request.getImageUrls() != null) {
+            trip.setImageUrls(request.getImageUrls());
+        }
+        Trip updated = tripRepository.save(trip);
+        log.info("[TripService] Direct Trip updated: id={}", updated.getId());
+        return TripResponse.from(updated);
+    }
 
     private Trip findOrThrow(String tripId) {
         return tripRepository.findById(tripId)

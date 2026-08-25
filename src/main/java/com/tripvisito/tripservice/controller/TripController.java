@@ -1,6 +1,7 @@
 package com.tripvisito.tripservice.controller;
 
 import com.tripvisito.tripservice.dto.request.GenerateTripRequest;
+import com.tripvisito.tripservice.dto.request.TripRequest;
 import com.tripvisito.tripservice.dto.response.ApiResponse;
 import com.tripvisito.tripservice.dto.response.PagedResponse;
 import com.tripvisito.tripservice.dto.response.TripResponse;
@@ -84,6 +85,38 @@ public class TripController {
             @PathVariable String id,
             @RequestHeader(value = "X-User-Id", required = false) String userId) {
         String finalUserId = userId != null ? userId : "3";
+        tripService.deleteTrip(id, finalUserId);
+        return ResponseEntity.ok(ApiResponse.success("Trip deleted successfully"));
+    }
+
+    // POST /api/v1/trip — Public / Admin
+    @PostMapping({"", "/"})
+    public ResponseEntity<ApiResponse<TripResponse>> createTrip(
+            @Valid @RequestBody TripRequest request,
+            @RequestHeader(value = "X-User-Id", required = false) String userId) {
+        String finalUserId = userId != null ? userId : "1";
+        TripResponse trip = tripService.createTrip(request, finalUserId);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success(201, "Trip created successfully", trip));
+    }
+
+    // PUT /api/v1/trip/{id} — Public / Admin
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<TripResponse>> updateTripDirect(
+            @PathVariable String id,
+            @Valid @RequestBody TripRequest request,
+            @RequestHeader(value = "X-User-Id", required = false) String userId) {
+        String finalUserId = userId != null ? userId : "1";
+        TripResponse updated = tripService.updateTripDirect(id, request, finalUserId);
+        return ResponseEntity.ok(ApiResponse.success("Trip updated successfully", updated));
+    }
+
+    // DELETE /api/v1/trip/{id} — Public / Admin
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteTripDirect(
+            @PathVariable String id,
+            @RequestHeader(value = "X-User-Id", required = false) String userId) {
+        String finalUserId = userId != null ? userId : "1";
         tripService.deleteTrip(id, finalUserId);
         return ResponseEntity.ok(ApiResponse.success("Trip deleted successfully"));
     }
